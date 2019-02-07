@@ -36,7 +36,9 @@ namespace Valve.VR.InteractionSystem
 		[Tooltip( "When detaching the object, should it return to its original parent?" )]
 		public bool restoreOriginalParent = false;
 
-        
+        public bool attachEaseIn = false;
+		public AnimationCurve snapAttachEaseInCurve = AnimationCurve.EaseInOut( 0.0f, 0.0f, 1.0f, 1.0f );
+		public float snapAttachEaseInTime = 0.15f;
 
 		protected VelocityEstimator velocityEstimator;
         protected bool attached = false;
@@ -46,9 +48,9 @@ namespace Valve.VR.InteractionSystem
         protected Transform attachEaseInTransform;
 
 		public UnityEvent onPickUp;
-        public UnityEvent onDetachFromHand;
-        public UnityEvent<Hand> onHeldUpdate;
+		public UnityEvent onDetachFromHand;
 
+		public bool snapAttachEaseInCompleted = false;
         
         protected RigidbodyInterpolation hadInterpolation = RigidbodyInterpolation.None;
 
@@ -64,7 +66,10 @@ namespace Valve.VR.InteractionSystem
 			velocityEstimator = GetComponent<VelocityEstimator>();
             interactable = GetComponent<Interactable>();
 
-
+			if ( attachEaseIn )
+			{
+				attachmentFlags &= ~Hand.AttachmentFlags.SnapOnAttach;
+			}
 
             rigidbody = GetComponent<Rigidbody>();
             rigidbody.maxAngularVelocity = 50.0f;
@@ -72,8 +77,7 @@ namespace Valve.VR.InteractionSystem
 
             if(attachmentOffset != null)
             {
-                // remove?
-                //interactable.handFollowTransform = attachmentOffset;
+                interactable.handFollowTransform = attachmentOffset;
             }
 
 		}
@@ -132,7 +136,7 @@ namespace Valve.VR.InteractionSystem
         //-------------------------------------------------
         protected virtual void OnAttachedToHand( Hand hand )
 		{
-            //Debug.Log("<b>[SteamVR Interaction]</b> Pickup: " + hand.GetGrabStarting().ToString());
+            //Debug.Log("Pickup: " + hand.GetGrabStarting().ToString());
 
             hadInterpolation = this.rigidbody.interpolation;
 
@@ -150,6 +154,12 @@ namespace Valve.VR.InteractionSystem
 			attachPosition = transform.position;
 			attachRotation = transform.rotation;
 
+			if ( attachEaseIn )
+			{
+                attachEaseInTransform = hand.objectAttachmentPoint;
+			}
+
+			snapAttachEaseInCompleted = false;
 		}
 
 
@@ -176,9 +186,6 @@ namespace Valve.VR.InteractionSystem
 
         public virtual void GetReleaseVelocities(Hand hand, out Vector3 velocity, out Vector3 angularVelocity)
         {
-            if (hand.noSteamVRFallbackCamera && releaseVelocityStyle != ReleaseStyle.NoChange)
-                releaseVelocityStyle = ReleaseStyle.ShortEstimation; // only type that works with fallback hand is short estimation.
-
             switch (releaseVelocityStyle)
             {
                 case ReleaseStyle.ShortEstimation:
@@ -207,7 +214,21 @@ namespace Valve.VR.InteractionSystem
         //-------------------------------------------------
         protected virtual void HandAttachedUpdate(Hand hand)
         {
-
+            if (attachEaseIn)
+            {
+                float t = Util.RemapNumberClamped(Time.time, attachTime, attachTime + snapAttachEaseInTime, 0.0f, 1.0f);
+                if (t < 1.0f)
+                {
+                    t = snapAttachEaseInCurve.Evaluate(t);
+                    transform.position = Vector3.Lerp(attachPosition, attachEaseInTransform.position, t);
+                    transform.rotation = Quaternion.Lerp(attachRotation, attachEaseInTransform.rotation, t);
+                }
+                else if (!snapAttachEaseInCompleted)
+                {
+                    gameObject.SendMessage("OnThrowableAttachEaseInCompleted", hand, SendMessageOptions.DontRequireReceiver);
+                    snapAttachEaseInCompleted = true;
+                }
+            }
 
             if (hand.IsGrabEnding(this.gameObject))
             {
@@ -221,9 +242,6 @@ namespace Valve.VR.InteractionSystem
                 // to teleport behind the hand when the player releases it.
                 //StartCoroutine( LateDetach( hand ) );
             }
-
-            if (onHeldUpdate != null)
-                onHeldUpdate.Invoke(hand);
         }
 
 

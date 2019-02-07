@@ -11,8 +11,8 @@ using System.Collections.Generic;
 
 namespace Valve.VR.InteractionSystem
 {
-    //-------------------------------------------------------------------------
-    public class Interactable : MonoBehaviour
+	//-------------------------------------------------------------------------
+	public class Interactable : MonoBehaviour
     {
         [Tooltip("Activates an action set on attach and deactivates on detach")]
         public SteamVR_ActionSet activateActionSetOnAttach;
@@ -32,40 +32,32 @@ namespace Valve.VR.InteractionSystem
         [Tooltip("The range of motion to set on the skeleton. None for no change.")]
         public SkeletalMotionRangeChange setRangeOfMotionOnPickup = SkeletalMotionRangeChange.None;
 
-        public delegate void OnAttachedToHandDelegate(Hand hand);
-        public delegate void OnDetachedFromHandDelegate(Hand hand);
+        public delegate void OnAttachedToHandDelegate( Hand hand );
+		public delegate void OnDetachedFromHandDelegate( Hand hand );
 
-        public event OnAttachedToHandDelegate onAttachedToHand;
-        public event OnDetachedFromHandDelegate onDetachedFromHand;
+		[HideInInspector]
+		public event OnAttachedToHandDelegate onAttachedToHand;
+		[HideInInspector]
+		public event OnDetachedFromHandDelegate onDetachedFromHand;
 
 
         [Tooltip("Specify whether you want to snap to the hand's object attachment point, or just the raw hand")]
         public bool useHandObjectAttachmentPoint = true;
 
-        public bool attachEaseIn = false;
-        [HideInInspector]
-        public AnimationCurve snapAttachEaseInCurve = AnimationCurve.EaseInOut(0.0f, 0.0f, 1.0f, 1.0f);
-        public float snapAttachEaseInTime = 0.15f;
-
-        public bool snapAttachEaseInCompleted = false;
-
-
-        // [Tooltip("The skeleton pose to apply when grabbing. Can only set this or handFollowTransform.")]
-        [HideInInspector]
-        public SteamVR_Skeleton_Poser skeletonPoser;
-
-        [Tooltip("Should the rendered hand lock on to and follow the object")]
-        public bool handFollowTransform= true;
+        [Tooltip("If you want the hand to stick to an object while attached, set the transform to stick to here")]
+        public Transform handFollowTransform;
+        public bool handFollowTransformPosition = true;
+        public bool handFollowTransformRotation = true;
 
 
         [Tooltip("Set whether or not you want this interactible to highlight when hovering over it")]
         public bool highlightOnHover = true;
-        protected MeshRenderer[] highlightRenderers;
-        protected MeshRenderer[] existingRenderers;
-        protected GameObject highlightHolder;
-        protected SkinnedMeshRenderer[] highlightSkinnedRenderers;
-        protected SkinnedMeshRenderer[] existingSkinnedRenderers;
-        protected static Material highlightMat;
+        private MeshRenderer[] highlightRenderers;
+        private MeshRenderer[] existingRenderers;
+        private GameObject highlightHolder;
+        private SkinnedMeshRenderer[] highlightSkinnedRenderers;
+        private SkinnedMeshRenderer[] existingSkinnedRenderers;
+        private static Material highlightMat;
         [Tooltip("An array of child gameObjects to not render a highlight for. Things like transparent parts, vfx, etc.")]
         public GameObject[] hideHighlight;
 
@@ -73,42 +65,25 @@ namespace Valve.VR.InteractionSystem
         [System.NonSerialized]
         public Hand attachedToHand;
 
-        [System.NonSerialized]
-        public Hand hoveringHand;
-
         public bool isDestroying { get; protected set; }
+
         public bool isHovering { get; protected set; }
         public bool wasHovering { get; protected set; }
-        
 
-        private void Awake()
-        {
-            skeletonPoser = GetComponent<SteamVR_Skeleton_Poser>();
-        }
-
-        protected virtual void Start()
+        private void Start()
         {
             highlightMat = (Material)Resources.Load("SteamVR_HoverHighlight", typeof(Material));
 
             if (highlightMat == null)
-                Debug.LogError("<b>[SteamVR Interaction]</b> Hover Highlight Material is missing. Please create a material named 'SteamVR_HoverHighlight' and place it in a Resources folder");
-
-            if (skeletonPoser != null)
-            {
-                if (useHandObjectAttachmentPoint)
-                {
-                    //Debug.LogWarning("<b>[SteamVR Interaction]</b> SkeletonPose and useHandObjectAttachmentPoint both set at the same time. Ignoring useHandObjectAttachmentPoint.");
-                    useHandObjectAttachmentPoint = false;
-                }
-            }
+                Debug.LogError("Hover Highlight Material is missing. Please create a material named 'SteamVR_HoverHighlight' and place it in a Resources folder");
+            
         }
 
-        protected virtual bool ShouldIgnoreHighlight(Component component)
+        private bool ShouldIgnoreHighlight(Component component)
         {
             return ShouldIgnore(component.gameObject);
         }
-
-        protected virtual bool ShouldIgnore(GameObject check)
+        private bool ShouldIgnore(GameObject check)
         {
             for (int ignoreIndex = 0; ignoreIndex < hideHighlight.Length; ignoreIndex++)
             {
@@ -119,7 +94,7 @@ namespace Valve.VR.InteractionSystem
             return false;
         }
 
-        protected virtual void CreateHighlightRenderers()
+        private void CreateHighlightRenderers()
         {
             existingSkinnedRenderers = this.GetComponentsInChildren<SkinnedMeshRenderer>(true);
             highlightHolder = new GameObject("Highlighter");
@@ -180,7 +155,7 @@ namespace Valve.VR.InteractionSystem
             }
         }
 
-        protected virtual void UpdateHighlightRenderers()
+        private void UpdateHighlightRenderers()
         {
             if (highlightHolder == null)
                 return;
@@ -226,95 +201,68 @@ namespace Valve.VR.InteractionSystem
             }
         }
 
-        /// <summary>
-        /// Called when a Hand starts hovering over this object
-        /// </summary>
-        protected virtual void OnHandHoverBegin(Hand hand)
+        private void HandHoverUpdate()
         {
-            wasHovering = isHovering;
-            isHovering = true;
-
-            hoveringHand = hand;
-
             if (highlightOnHover == true)
             {
-                CreateHighlightRenderers();
-                UpdateHighlightRenderers();
+                if (wasHovering == false)
+                {
+                    isHovering = true;
+                    CreateHighlightRenderers();
+                    UpdateHighlightRenderers();
+                }
+
             }
+            isHovering = true;
         }
 
 
-        /// <summary>
-        /// Called when a Hand stops hovering over this object
-        /// </summary>
-        private void OnHandHoverEnd(Hand hand)
+        private void Update()
         {
             wasHovering = isHovering;
-            isHovering = false;
 
-            if (highlightOnHover && highlightHolder != null)
-                Destroy(highlightHolder);
-        }
-
-        protected virtual void Update()
-        {
             if (highlightOnHover)
             {
                 UpdateHighlightRenderers();
 
-                if (isHovering == false && highlightHolder != null)
+                if (wasHovering == false && isHovering == false && highlightHolder != null)
                     Destroy(highlightHolder);
+
+                isHovering = false;
             }
         }
         
-
-        protected float blendToPoseTime = 0.1f;
-        protected float releasePoseBlendTime = 0.2f;
-
-        protected virtual void OnAttachedToHand(Hand hand)
+        private void OnAttachedToHand( Hand hand )
         {
             if (activateActionSetOnAttach != null)
-                activateActionSetOnAttach.Activate(hand.handType);
+                activateActionSetOnAttach.ActivatePrimary();
 
-            if (onAttachedToHand != null)
-            {
-                onAttachedToHand.Invoke(hand);
-            }
-
-            if (skeletonPoser != null && hand.skeleton != null)
-            {
-                hand.skeleton.BlendToPoser(skeletonPoser, blendToPoseTime);
-            }
+            if ( onAttachedToHand != null )
+			{
+				onAttachedToHand.Invoke( hand );
+			}
 
             attachedToHand = hand;
         }
 
-        protected virtual void OnDetachedFromHand(Hand hand)
+		private void OnDetachedFromHand( Hand hand )
         {
             if (activateActionSetOnAttach != null)
             {
-                if (hand.otherHand == null || hand.otherHand.currentAttachedObjectInfo.HasValue == false ||
-                    (hand.otherHand.currentAttachedObjectInfo.Value.interactable != null &&
-                     hand.otherHand.currentAttachedObjectInfo.Value.interactable.activateActionSetOnAttach != this.activateActionSetOnAttach))
+                if (hand.otherHand.currentAttachedObjectInfo.HasValue == false || (hand.otherHand.currentAttachedObjectInfo.Value.interactable != null && 
+                    hand.otherHand.currentAttachedObjectInfo.Value.interactable.activateActionSetOnAttach != this.activateActionSetOnAttach))
                 {
-                    activateActionSetOnAttach.Deactivate(hand.handType);
+                    activateActionSetOnAttach.Deactivate();
                 }
             }
 
-            if (onDetachedFromHand != null)
-            {
-                onDetachedFromHand.Invoke(hand);
-            }
-
-
-            if (skeletonPoser != null)
-            {
-                if (hand.skeleton != null)
-                    hand.skeleton.BlendToSkeleton(releasePoseBlendTime);
-            }
+            if ( onDetachedFromHand != null )
+			{
+				onDetachedFromHand.Invoke( hand );
+			}
 
             attachedToHand = null;
-        }
+		}
 
         protected virtual void OnDestroy()
         {
@@ -322,27 +270,9 @@ namespace Valve.VR.InteractionSystem
 
             if (attachedToHand != null)
             {
-                attachedToHand.DetachObject(this.gameObject, false);
-                attachedToHand.skeleton.BlendToSkeleton(0.1f);
-            }
-            
-            if (highlightHolder != null)
-                Destroy(highlightHolder);
-            
-        }
-
-
-        protected virtual void OnDisable()
-        {
-            isDestroying = true;
-
-            if (attachedToHand != null)
-            {
                 attachedToHand.ForceHoverUnlock();
+                attachedToHand.DetachObject(this.gameObject, false);
             }
-
-            if (highlightHolder != null)
-                Destroy(highlightHolder);
         }
     }
 }

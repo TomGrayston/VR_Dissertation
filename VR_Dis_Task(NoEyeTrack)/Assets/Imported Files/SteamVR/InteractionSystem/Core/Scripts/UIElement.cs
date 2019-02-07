@@ -17,10 +17,10 @@ namespace Valve.VR.InteractionSystem
 	{
 		public CustomEvents.UnityEventHand onHandClick;
 
-        protected Hand currentHand;
+		private Hand currentHand;
 
 		//-------------------------------------------------
-		protected virtual void Awake()
+		void Awake()
 		{
 			Button button = GetComponent<Button>();
 			if ( button )
@@ -31,7 +31,7 @@ namespace Valve.VR.InteractionSystem
 
 
 		//-------------------------------------------------
-		protected virtual void OnHandHoverBegin( Hand hand )
+		private void OnHandHoverBegin( Hand hand )
 		{
 			currentHand = hand;
 			InputModule.instance.HoverBegin( gameObject );
@@ -39,8 +39,8 @@ namespace Valve.VR.InteractionSystem
 		}
 
 
-        //-------------------------------------------------
-        protected virtual void OnHandHoverEnd( Hand hand )
+		//-------------------------------------------------
+		private void OnHandHoverEnd( Hand hand )
 		{
 			InputModule.instance.HoverEnd( gameObject );
 			ControllerButtonHints.HideButtonHint( hand, hand.uiInteractAction);
@@ -48,8 +48,8 @@ namespace Valve.VR.InteractionSystem
 		}
 
 
-        //-------------------------------------------------
-        protected virtual void HandHoverUpdate( Hand hand )
+		//-------------------------------------------------
+		private void HandHoverUpdate( Hand hand )
 		{
 			if ( hand.uiInteractAction != null && hand.uiInteractAction.GetStateDown(hand.handType) )
 			{
@@ -59,8 +59,8 @@ namespace Valve.VR.InteractionSystem
 		}
 
 
-        //-------------------------------------------------
-        protected virtual void OnButtonClick()
+		//-------------------------------------------------
+		private void OnButtonClick()
 		{
 			onHandClick.Invoke( currentHand );
 		}

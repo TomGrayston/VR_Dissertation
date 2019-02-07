@@ -45,7 +45,7 @@ namespace Valve.VR.InteractionSystem.Sample
             }
         }
 
-        public void SetRenderModel(RenderModelChangerUI prefabs)
+        public void SetRenderModel(RenderModelHolder prefabs)
         {
             for (int handIndex = 0; handIndex < Player.instance.hands.Length; handIndex++)
             {

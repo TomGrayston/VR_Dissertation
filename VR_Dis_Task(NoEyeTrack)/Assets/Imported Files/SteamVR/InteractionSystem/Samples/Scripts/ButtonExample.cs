@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-namespace Valve.VR.InteractionSystem.Sample
+namespace Valve.VR.InteractionSystem
 {
     public class ButtonExample : MonoBehaviour
     {

@@ -2,13 +2,12 @@
   "source": "Unity",
   "applications": [
     {
-      "app_key": "application.generated.unity.vr_dis_tasknoeyetrack.exe",
+      "app_key": "application.generated.unity.vr_testing.exe",
       "launch_type": "url",
       "url": "steam://launch/",
-      "action_manifest_path": "D:\\Tom Grayston\\GitHub\\VR_Dissertation\\VR_Dis_Task(NoEyeTrack)\\actions.json",
       "strings": {
         "en_us": {
-          "name": "VR_Dis_Task(NoEyeTrack) [Testing]"
+          "name": "VR_Testing [Testing]"
         }
       }
     }
