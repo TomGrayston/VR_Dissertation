@@ -1,5 +1,9 @@
 using UnityEngine;
+using UnityEngine.UI;
+using UnityEngine.Events;
 using VRStandardAssets.Utils;
+using System.Collections.Generic;
+using System.Collections;
 
 namespace VRStandardAssets.Examples
 {
@@ -13,6 +17,11 @@ namespace VRStandardAssets.Examples
         [SerializeField] private Renderer m_Renderer;
         [SerializeField] public GameObject Button;
         [SerializeField] public GameObject targets;
+
+        public Image timerImg;
+        public float totalTime = 2;
+        bool status;
+        public float timer;
 
 
         private void Awake ()
@@ -40,8 +49,17 @@ namespace VRStandardAssets.Examples
         {
             Debug.Log("Show over state");
             m_Renderer.material = m_OverMaterial;
-            Destroy(Button, 2.0f);
-            targets.SetActive(true);
+
+            if(status = true)
+            {
+                timer += Time.deltaTime;
+                timerImg.fillAmount = timer/ totalTime;
+            }
+            if(timer > totalTime)
+            {
+                targets.SetActive(true);
+                Destroy(Button);
+            }
         }
 
 
@@ -51,6 +69,18 @@ namespace VRStandardAssets.Examples
             Debug.Log("Show out state");
             m_Renderer.material = m_NormalMaterial;
             targets.SetActive(false);
+        }
+
+        public void countdown()
+        {
+            status = true;
+        }
+
+        public void haltCountdown()
+        {
+            status = false;
+            timer = 0;
+            timerImg.fillAmount = 0;
         }
     }
 
