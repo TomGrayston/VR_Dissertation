@@ -18,7 +18,7 @@ namespace VRStandardAssets.Examples
         [SerializeField] public GameObject Button;
         [SerializeField] public GameObject targets;
 
-        public Image timerImg;
+        [SerializeField]public Image timerImg;
         public float totalTime = 2;
         bool status;
         public float timer;
@@ -43,23 +43,25 @@ namespace VRStandardAssets.Examples
             m_InteractiveItem.OnOut -= HandleOut;
         }
 
-
         //Handle the Over event
         private void HandleOver()
         {
             Debug.Log("Show over state");
             m_Renderer.material = m_OverMaterial;
 
-            if(status = true)
+
+            /* status = true;
+
+            if(status == true)
             {
                 timer += Time.deltaTime;
-                timerImg.fillAmount = timer/ totalTime;
+                timerImg.fillAmount = timer/totalTime;
             }
             if(timer > totalTime)
             {
                 targets.SetActive(true);
                 Destroy(Button);
-            }
+            }*/
         }
 
 
@@ -68,19 +70,15 @@ namespace VRStandardAssets.Examples
         {
             Debug.Log("Show out state");
             m_Renderer.material = m_NormalMaterial;
-            targets.SetActive(false);
-        }
 
-        public void countdown()
-        {
-            status = true;
-        }
+            /*
 
-        public void haltCountdown()
-        {
             status = false;
             timer = 0;
             timerImg.fillAmount = 0;
+
+            targets.SetActive(false);
+            */
         }
     }
 

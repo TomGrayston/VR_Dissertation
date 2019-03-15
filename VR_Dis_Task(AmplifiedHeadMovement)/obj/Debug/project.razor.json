@@ -1,0 +1,14 @@
+{
+  "ProjectFilePath": "d:\\Tom Grayston\\GitHub\\VR_Dissertation\\VR_Dis_Task(AmplifiedHeadMovement)\\SteamVR_Windows_EditorHelper.csproj",
+  "TargetFramework": "v4.7.1",
+  "TagHelpers": [],
+  "Configuration": {
+    "ConfigurationName": "UnsupportedRazor",
+    "LanguageVersion": "1.0",
+    "Extensions": [
+      {
+        "ExtensionName": "UnsupportedRazorExtension"
+      }
+    ]
+  }
+}
