@@ -43,17 +43,12 @@ public class EyeTrackingExample : MonoBehaviour
 
             //Create the Amplifcation factor
             float AF = createAF(AngleDiff);
-            //print(AF);
 
-            //print("Last Frame's XYZ: " + LastFrameXYZ);
-            //print("This Frame's XYZ: " + ThisFrameXYZ);
             //get the diffrence in degrees
             Vector3 difInDegrees = GetXYZ_Diff(LastFrameXYZ, ThisFrameXYZ);
-            //print("The Diffrence: " + difInDegrees);
 
             //Get the Amplified xyz values
             Vector3 AmpVals = amplify(AF, difInDegrees);
-            //print("Amplified by " + AF + " : " + AmpVals);
 
             //Make the new Amplified Quaternion
             Quaternion AmpRotation = Quaternion.Euler(AmpVals);

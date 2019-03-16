@@ -12,9 +12,11 @@ public class UserCameraMatch : MonoBehaviour
     {
         Quaternion replacementQuaternion = Quaternion.Euler(Vector3.zero);
 
-        //Body.transform.position = VR_cam.transform.localPosition;
+        Body.transform.position = VR_cam.transform.localPosition;
+        //Body.transform.rotation = VR_cam.transform.rotation;
         VR_cam.transform.position = new Vector3(0, 0, 0);
-        print("NEW VR Cam position" + VR_cam.transform.localPosition);
+        VR_cam.transform.rotation = Body.transform.rotation;
+        Body.transform.rotation = replacementQuaternion;
         
     }
 }

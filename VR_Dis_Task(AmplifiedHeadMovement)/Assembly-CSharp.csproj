@@ -55,6 +55,8 @@
   <ItemGroup>
      <Compile Include="Assets\1) Base Amplification\Scripts\Amplification.cs" />
      <Compile Include="Assets\2) co-sign Amp\Scripts\AmplificationCoSign.cs" />
+     <Compile Include="Assets\Scripts\EyeTracking2Zones.cs" />
+     <Compile Include="Assets\Scripts\EyeTrackingCOS_GAZE.cs" />
      <Compile Include="Assets\Scripts\EyeTrackingExample.cs" />
      <Compile Include="Assets\Scripts\Tracking_Data_Manager.cs" />
      <Compile Include="Assets\Scripts\UserCameraMatch.cs" />
