@@ -9,9 +9,9 @@ public class EyeTrackingExample : MonoBehaviour
 {
     // Start is called before the first frame update
 
-    float Zone1 = 15;
-    float Zone2 = 25;
-    float Zone3 = 35;
+    float Zone1 = 10;
+    float Zone2 = 20;
+    float Zone3 = 30;
     public Quaternion lastRotation = Quaternion.identity;       //get the last Quaternion
     public Camera HMD;
 
@@ -43,6 +43,7 @@ public class EyeTrackingExample : MonoBehaviour
 
             //Create the Amplifcation factor
             float AF = createAF(AngleDiff);
+            print(AF);
 
             //get the diffrence in degrees
             Vector3 difInDegrees = GetXYZ_Diff(LastFrameXYZ, ThisFrameXYZ);

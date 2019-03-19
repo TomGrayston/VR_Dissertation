@@ -9,8 +9,8 @@ public class EyeTracking2Zones : MonoBehaviour
 {
     // Start is called before the first frame update
 
-    float Zone1 = 20;
-    float Zone2 = 50;
+    float Zone1 = 10;
+    float Zone2 = 30;
     public Quaternion lastRotation = Quaternion.identity;       //get the last Quaternion
     public Camera HMD;
 
@@ -71,10 +71,10 @@ public class EyeTracking2Zones : MonoBehaviour
             }
             else if(AngleDiff < Zone2 && AngleDiff > Zone1)
             {
-                return 2f;
+                return 1.5f;
             }
             else{
-                return 2f;
+                return 1.5f;
             }
         }
 
