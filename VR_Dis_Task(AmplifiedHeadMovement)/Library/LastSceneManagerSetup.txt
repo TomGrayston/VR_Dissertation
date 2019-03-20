@@ -1,4 +1,4 @@
 sceneSetups:
-- path: Assets/1) Base Amplification/BaseAmp.unity
+- path: Assets/2) co-sign Amp/cos Amp.unity
   isLoaded: 1
   isActive: 1
